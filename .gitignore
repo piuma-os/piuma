@@ -1,0 +1,6 @@
+/target
+disk.qcow2
+OVMF_VARS.4m.fd
+kernel
+temp
+tmp

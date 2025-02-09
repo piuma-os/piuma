@@ -1,0 +1,20 @@
+
+[package]
+name = "piuma"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[dependencies]
+flanterm = "0.0.2"
+limone = "0.0.5"
+
+[patch.crates-io]
+# flanterm = { path = "../flanterm" }
+# limone = { path = "../limone" }
