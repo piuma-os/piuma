@@ -1,10 +1,11 @@
 #![no_std]
 #![no_main]
+#![feature(abi_x86_interrupt)]
 #![feature(naked_functions)]
 
 use core::arch::{asm, naked_asm};
-use core::ptr::null_mut;
 
+use flanterm::Context;
 use limone::{
     requests::{
         bootloader_info::BootloaderInfoRequest, framebuffer::FramebufferRequest, RequestsEndMarker,
@@ -58,56 +59,17 @@ unsafe extern "C" fn kmain() -> ! {
 
     if let Some(framebuffer_response) = FRAMEBUFFER_REQUEST.get_response() {
         if let Some(framebuffer) = framebuffer_response.framebuffers().get(0) {
-            let framebuffer = framebuffer.as_raw();
-
-            unsafe {
-                let ctx = flanterm::sys::flanterm_fb_init(
-                    None,
-                    None,
-                    framebuffer.address.cast(),
-                    framebuffer.width as _,
-                    framebuffer.height as _,
-                    framebuffer.pitch as _,
-                    framebuffer.red_mask_size,
-                    framebuffer.red_mask_shift,
-                    framebuffer.green_mask_size,
-                    framebuffer.green_mask_shift,
-                    framebuffer.blue_mask_size,
-                    framebuffer.blue_mask_shift,
-                    null_mut(),
-                    null_mut(),
-                    null_mut(),
-                    null_mut(),
-                    null_mut(),
-                    null_mut(),
-                    null_mut(),
-                    null_mut(),
-                    0,
-                    0,
-                    1,
-                    0,
-                    0,
-                    10,
-                );
-
-                let splash = "Piuma\nKernel: 0.0.1\n";
-                let booted = "Bootloader: ";
-                let separator = " ";
-
+            if let Some(mut ctx) = Context::from_framebuffer(framebuffer) {
                 let info = INFO_REQUEST.get_response().unwrap();
 
                 let name = info.name();
                 let version = info.version();
 
-                flanterm::sys::flanterm_write(ctx, splash.as_ptr().cast(), splash.len());
-                flanterm::sys::flanterm_write(ctx, booted.as_ptr().cast(), booted.len());
-                flanterm::sys::flanterm_write(ctx, name.as_ptr(), name.to_bytes_with_nul().len());
-                flanterm::sys::flanterm_write(ctx, separator.as_ptr().cast(), separator.len());
-                flanterm::sys::flanterm_write(
-                    ctx,
-                    version.as_ptr(),
-                    version.to_bytes_with_nul().len(),
-                );
+                ctx.write(b"Piuma\nKernel: 0.0.1\n");
+                ctx.write(b"Bootloader: ");
+                ctx.write(name.to_bytes_with_nul());
+                ctx.write(b" ");
+                ctx.write(version.to_bytes_with_nul());
             }
         }
     }
