@@ -7,11 +7,11 @@ use core::arch::{asm, naked_asm};
 
 use flanterm::Context;
 use limone::{
-    requests::{
-        bootloader_info::BootloaderInfoRequest, framebuffer::FramebufferRequest, RequestsEndMarker,
-        RequestsStartMarker,
-    },
     BaseRevision,
+    requests::{
+        RequestsEndMarker, RequestsStartMarker, bootloader_info::BootloaderInfoRequest,
+        framebuffer::FramebufferRequest,
+    },
 };
 use serial::init_serial;
 
@@ -20,43 +20,45 @@ pub mod panic;
 pub mod serial;
 
 #[used]
-#[link_section = ".limine_requests_start"]
+#[unsafe(link_section = ".limine_requests_start")]
 static _START_MARKER: RequestsStartMarker = RequestsStartMarker::new();
 
 #[used]
-#[link_section = ".limine_requests_end"]
+#[unsafe(link_section = ".limine_requests_end")]
 static _END_MARKER: RequestsEndMarker = RequestsEndMarker::new();
 
 #[used]
-#[link_section = ".limine_requests"]
+#[unsafe(link_section = ".limine_requests")]
 static BASE_REVISION: BaseRevision = BaseRevision::LATEST;
 
 #[used]
-#[link_section = ".limine_requests"]
+#[unsafe(link_section = ".limine_requests")]
 static FRAMEBUFFER_REQUEST: FramebufferRequest = FramebufferRequest::new();
 
 #[used]
-#[link_section = ".limine_requests"]
+#[unsafe(link_section = ".limine_requests")]
 static INFO_REQUEST: BootloaderInfoRequest = BootloaderInfoRequest::new();
 
 /// Initializes basic simds and fpu
 #[naked]
 unsafe extern "C" fn init_cpu_features() {
-    naked_asm!(
-        // Load CR0, modify its bits
-        "mov rax, cr0",   // Get current CR0 value
-        "and ax, 0xFFFB", // Clear EM (bit 2)
-        "or ax, 0x2",     // Set MP (bit 1)
-        "mov cr0, rax",   // Write back to CR0
-        // Load CR4, modify its bits
-        "mov rax, cr4",  // Get current CR4 value
-        "or ax, 3 << 9", // Set OSFXSR (bit 9) and OSXMMEXCPT (bit 10)
-        "mov cr4, rax",  // Write back to CR4
-        "ret",           // Return from function
-    );
+    unsafe {
+        naked_asm!(
+            // Load CR0, modify its bits
+            "mov rax, cr0",   // Get current CR0 value
+            "and ax, 0xFFFB", // Clear EM (bit 2)
+            "or ax, 0x2",     // Set MP (bit 1)
+            "mov cr0, rax",   // Write back to CR0
+            // Load CR4, modify its bits
+            "mov rax, cr4",  // Get current CR4 value
+            "or ax, 3 << 9", // Set OSFXSR (bit 9) and OSXMMEXCPT (bit 10)
+            "mov cr4, rax",  // Write back to CR4
+            "ret",           // Return from function
+        );
+    }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
     unsafe {
         init_cpu_features();
