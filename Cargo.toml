@@ -16,5 +16,5 @@ flanterm = "0.0.2"
 limone = "0.0.5"
 
 [patch.crates-io]
-# flanterm = { path = "../flanterm" }
-# limone = { path = "../limone" }
+flanterm = { git = "https://github.com/morr0ne/flanterm" }
+limone = { git = "https://github.com/piuma-os/limone" }

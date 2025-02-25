@@ -4,9 +4,9 @@ version = 4
 
 [[package]]
 name = "cc"
-version = "1.2.13"
+version = "1.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7777341816418c02e033934a09f20dc0ccaf65a5201ef8a450ae0105a573fda"
+checksum = "c736e259eea577f443d5c86c304f9f4ae0295c43f3ba05c21f1d66b5f06001af"
 dependencies = [
  "shlex",
 ]
@@ -14,17 +14,16 @@ dependencies = [
 [[package]]
 name = "flanterm"
 version = "0.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d952f6a34aab79341bd9faee86b4449260bf1d6d328e49058141c86e414fb96a"
+source = "git+https://github.com/morr0ne/flanterm#115f36e73d89de632d979e4c8218508f8674270a"
 dependencies = [
  "cc",
+ "limone",
 ]
 
 [[package]]
 name = "limone"
 version = "0.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "78ea8d1257fb9b9be68ef3cc48c26e11cf4c34a88be8888636d425a2fbfcb1d2"
+source = "git+https://github.com/piuma-os/limone#25b3c4fd00464fef5ad00c189d4919d042a45e57"
 
 [[package]]
 name = "piuma"
