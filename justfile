@@ -1,3 +1,7 @@
+_:
+    @just --list
+
+
 build:
     cargo build --release
     cp target/x86_64-unknown-none/release/piuma kernel
